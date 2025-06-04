@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import com.example.project_yum.model.Recipe
 import com.example.project_yum.viewmodel.SearchUiState
 import com.example.project_yum.viewmodel.SearchedViewModel
-import com.example.project_yum.ui.RecipeCard
 
 @Composable
 fun SearchedScreen(
@@ -29,7 +28,7 @@ fun SearchedScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(query) {
-        viewModel.searchRecipes(query)
+        viewModel.setSearchQuery(query)
     }
 
     Box(
@@ -53,26 +52,28 @@ fun SearchedScreen(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(16.dp)
+                .padding(top = 16.dp, start = 56.dp, end = 56.dp) // Adjusted padding for longer queries
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 64.dp, bottom = 96.dp)
         ) {
-            when (uiState) {
+            when (val state = uiState) {
                 is SearchUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 }
                 is SearchUiState.Success -> {
-                    val recipes = (uiState as SearchUiState.Success).recipes
+                    val recipes = state.recipes
                     if (recipes.isEmpty()) {
-                        Text(
-                            text = "No results for \"$query\".",
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "No results for \"$query\".",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     } else {
                         LazyColumn(
                             modifier = Modifier.weight(1f),
@@ -83,19 +84,30 @@ fun SearchedScreen(
                                 RecipeCard(
                                     recipe = recipe,
                                     onClick = { onRecipeClick(recipe) }
-                                    )
+                                )
                             }
                         }
                     }
                 }
                 is SearchUiState.Error -> {
-                    Text(
-                        text = "Error: ${(uiState as SearchUiState.Error).message}",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Error: ${state.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
-                SearchUiState.Idle -> {}
+                SearchUiState.Idle -> {
+                    if (query.isBlank()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Enter a query to search.",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
 
