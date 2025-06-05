@@ -52,7 +52,7 @@ fun SearchedScreen(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 16.dp, start = 56.dp, end = 56.dp) // Adjusted padding for longer queries
+                .padding(top = 16.dp, start = 56.dp, end = 56.dp)
         )
         Column(
             modifier = Modifier

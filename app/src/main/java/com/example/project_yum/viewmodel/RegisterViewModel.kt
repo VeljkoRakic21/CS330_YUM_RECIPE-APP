@@ -82,7 +82,6 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
                         onError("Account with that username already exists.")
                     }
                 } else {
-                    // Ako ne postoji, šalji POST zahtev za registraciju
                     UserRetrofitInstance.api.registerUser(user).enqueue(object : Callback<User> {
                         override fun onResponse(call: Call<User>, response: Response<User>) {
                             if (response.isSuccessful) {
